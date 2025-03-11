@@ -7,6 +7,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     buttonText: "#ffffff",
   },
   providers: [],
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     authorized: async ({ auth }) => {
       // Logged in users are authenticated, otherwise redirect to login page
