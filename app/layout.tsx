@@ -2,6 +2,7 @@ import "@/app/global.css";
 import { SessionProvider } from "next-auth/react";
 import { Metadata } from "next";
 
+
 export const metadata: Metadata = {
   title: "Cinema Guru | Atlas School",
 };

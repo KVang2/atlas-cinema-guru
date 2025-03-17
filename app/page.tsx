@@ -1,54 +1,86 @@
 "use client";
-import React from "react";
-import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
+import React, { useState } from "react";
+import Layout from "@/components/Layout";
 
-export default function Page() {
-  const { user, logout } = useAuth();
+export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [minYear, setMinYear] = useState("");
+  const [maxYear, setMaxYear] = useState("");
+  const [results, setResults] = useState([]);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!searchQuery.trim()) return;
+
+    try {
+      const response = await fetch(`/api/search?query=${searchQuery}`);
+      const data = await response.json();
+      setResults(data.results);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+  };
 
   return (
-    <div className="flex h-screen">
+    <Layout>
+      <div className="grid grid-cols-2 gap-6 p-8 ml-4">
 
-      {/* Sidebar */}
-      <div className="group fixed top-0 left-0 h-full bg-[#1ED2AF] p-5 pt-8 shadow-lg transition-all duration-300 border-r-2 border-blue-800
-        w-25 hover:w-50 overflow-hidden">
-        <div className="flex flex-col mt-15 ml-2 space-y-6">
-          {/* Home */}
-          <Link href="/" className="flex items-center space-x-4 cursor-pointer">
-            <img src="/images/folder.png" alt="Folder Icon" className="w-10 h-10" />
-            <span className="text-white text-lg transition-opacity duration-300 opacity-0 group-hover:opacity-100">Home</span>
-          </Link>
-
-          {/* Favorite */}
-          <Link href="/app/api/favorites" className="flex items-center space-x-4 cursor-pointer">
-            <img src="/images/Icon.png" alt="Fav Icon" className="w-10 h-10" />
-            <span className="text-white text-lg transition-opacity duration-300 opacity-0 group-hover:opacity-100">Favorite</span>
-          </Link>
-
-          {/* Watch Later */}
-          <Link href="/app/api/watch-later" className="flex items-center space-x-4 cursor-pointer">
-            <img src="/images/fillclock.png" alt="Watch Later Icon" className="w-10 h-10" />
-            <span className="text-white text-lg transition-opacity duration-300 whitespace-nowrap opacity-0 group-hover:opacity-100">Watch Later</span>
-          </Link>
-
-          {/* Latest Activities */}
+        {/* Search Bar */}
+        <div className="flex flex-col space-y-4">
+          <div>
+            <span className="text-white">Search</span>
+            <form onSubmit={handleSearch} className="mt-6 flex space-x-4">
+              <input
+                type="text"
+                placeholder="Search movies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="p-2 w-80 border border-[#1ED2AF] bg-[#00003c] rounded-full text-white"
+              />
+            </form>
+          </div>
+        
+        {/* Min Year/ Max Year */}
+        <div className="flex space-x-4">
+            <div className="flex flex-col">
+              <span className="text-white m-1">Min Year</span>
+              <input
+                type="text"
+                title="Min Year"
+                value={minYear}
+                onChange={(e) => setMinYear(e.target.value)}
+                className="p-2 w-40 border border-[#1ED2AF] rounded-full text-white bg-[#00003c] text-center outline-none"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-white m-1">Max Year</span>
+              <input
+                type="text"
+                title="Max Year"
+                value={maxYear}
+                onChange={(e) => setMaxYear(e.target.value)}
+                className="p-2 w-40 border border-[#1ED2AF] rounded-full text-white bg-[#00003c] text-center outline-none"
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Genre Options */}
+        <div>
+          <span className="text-white font-bold">Genres</span>
+          <div className="grid grid-cols-5 gap-2 mt-2">
+            {["Romance", "Horror", "Drama", "Action", "Mystery", "Fantasy", "Thriller", "Western", "Sci-fi", "Adventure"].map((genre) => (
+              <button 
+                key={genre} 
+                className="px-3 py-1 bg-[#00003c] text-white rounded-full hover:bg-[#1ED2AF] border-[#1ED2AF] border-1"
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      
-      {/* Header */}
-      <div className="fixed top-0 left-0 right-0 bg-[#1ED2AF] text-[#00003c] flex items-center justify-between p-4">
-        {/* Logo/Title */}
-        <div className="flex items-center">
-          <img src="/images/film.png" alt="film Icon" className="flex w-10 h-10" />
-          <h1 className="ml-2 text-lg font-semibold">Cinema Guru</h1>
-        </div>
-
-        {/* User Name/Logout */}
-        <div className="flex items-center space-x-6">
-          <span className="text-[#00003c] text-sm">welcome, {user?.email}</span>
-          <button className="text-[#00003c] text-sm hover:underline" onClick={logout}>Logout</button>
-        </div>
-      </div>
-  </div>
+    </Layout>
   );
 }
