@@ -1,4 +1,5 @@
 import "@/app/global.css";
+import { SessionProvider } from "next-auth/react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ type Props = {
 export default function RootLayout({ children }: Props) {
   return (
     <html lang="en">
-      <body className={`antialiased  bg-[#00003c] text-white`}>{children}</body>
+      <body className={`antialiased  bg-[#00003c] text-white`}><SessionProvider>{children}</SessionProvider></body>
     </html>
   );
 }
