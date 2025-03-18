@@ -77,42 +77,53 @@ export default function HomePage() {
   return (
     <Layout>
       {/* Filters Section */}
-      <div className="flex flex-col items-center p-8">
+      <div className="flex justify-between items-start p-8">
         {/* Search */}
-        <div className="flex flex-col space-y-4 mb-4">
-          <span className="text-white">Search</span>
-          <input
-            type="text"
-            placeholder="Search movies..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="p-2 w-80 border border-[#1ED2AF] bg-[#00003c] rounded-full text-white text-center"
-          />
-        </div>
+        <div>
+          <div className="flex flex-col space-y-4 mb-4">
+            <span className="text-white">Search</span>
+            <input
+              type="text"
+              placeholder="Search movies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="p-2 w-80 border border-[#1ED2AF] bg-[#00003c] rounded-full text-white text-center"
+            />
+          </div>
 
-        {/* Min Year/ Max Year */}
-        <div className="flex space-x-4 mb-4">
-          <input
-            type="text"
-            placeholder="Min Year"
-            value={minYear}
-            onChange={(e) => setMinYear(e.target.value)}
-            maxLength={4}
-            className="p-2 w-40 border border-[#1ED2AF] rounded-full text-white bg-[#00003c] text-center outline-none"
-          />
-          <input
-            type="text"
-            placeholder="Max Year"
-            value={maxYear}
-            onChange={(e) => setMaxYear(e.target.value)}
-            maxLength={4}
-            className="p-2 w-40 border border-[#1ED2AF] rounded-full text-white bg-[#00003c] text-center outline-none"
-          />
+          {/* Min Year/ Max Year */}
+          <div className="flex space-x-4 mb-4">
+            <div className="flex flex-col items-center">
+              <span className="text-white">Min Year</span>
+              <input
+                type="text"
+                placeholder="1990"
+                value={minYear}
+                onChange={(e) => setMinYear(e.target.value)}
+                maxLength={4}
+                className="p-2 w-40 border border-[#1ED2AF] rounded-full text-white bg-[#00003c] text-center"
+              />
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-white">Max Year</span>
+              <input
+                type="text"
+                placeholder="2024"
+                value={maxYear}
+                onChange={(e) => setMaxYear(e.target.value)}
+                maxLength={4}
+                className="p-2 w-40 border border-[#1ED2AF] rounded-full text-white bg-[#00003c] text-center"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Genre Options */}
-        <div className="text-center mb-6">
-          <span className="text-white font-bold">Genres</span>
+        <div className="flex flex-col mb-6">
+
+          <div className="mb-2">
+            <span className="text-white font-bold">Genres</span>
+          </div>
           <div className="grid grid-cols-5 gap-2 mt-2">
             {["Romance", "Horror", "Drama", "Action", "Mystery", "Fantasy", "Thriller", "Western", "Sci-Fi", "Adventure"].map(
               (genre) => (
