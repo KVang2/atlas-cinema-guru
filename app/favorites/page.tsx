@@ -7,7 +7,14 @@ import Layout from "@/components/Layout";
 export default function favorites() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [favorites, setFavorites] = useState([]);
+
+    interface Movie {
+        id: string;
+        title: string;
+        image: string;
+    }
+
+    const [favorites, setFavorites] = useState<Movie[]>([]);
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -41,12 +48,20 @@ export default function favorites() {
 
             {/* Favorite Movies */}
             <div className="grid grid-cols-3 pt-4 gap-8">
-                <img src="/images/photo1.jpg" alt="Photo 1" className="w-full h-auto rounded-lg shadow-md" />
-                <img src="/images/photo2.jpg" alt="Photo 2" className="w-full h-auto rounded-lg shadow-md" />
-                <img src="/images/photo3.jpg" alt="Photo 3" className="w-full h-auto rounded-lg shadow-md" />
-                <img src="/images/photo4.jpg" alt="Photo 4" className="w-full h-auto rounded-lg shadow-md" />
-                <img src="/images/photo5.jpg" alt="Photo 5" className="w-full h-auto rounded-lg shadow-md" />
-                <img src="/images/photo6.jpg" alt="Photo 6" className="w-full h-auto rounded-lg shadow-md" />
+                {favorites.length > 0 ? (
+                    favorites.map((movie) => (
+                        <div key={movie.id} className="text-center">
+                            <img 
+                                src={movie.image} 
+                                alt={movie.title} 
+                                className="w-full h-auto rounded-lg shadow-md" 
+                            />
+                            <p className="text-white mt-2">{movie.title}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-gray-400 col-span-3 text-center">No favorites found.</p>
+                )}
             </div>
         </div>
     </Layout>

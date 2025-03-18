@@ -54,7 +54,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-grow ml-16 mt-16 p-6 bg-gray-900 text-white w-full">
+      <main className="flex-grow ml-16 mt-16 p-6 bg-[#00003c] text-white w-full">
         {children}
       </main>
   </div>
