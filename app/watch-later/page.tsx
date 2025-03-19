@@ -72,13 +72,15 @@ export default function WatchLaterPage() {
             <p className="text-gray-400 col-span-3 text-center">No movies in Watch Later.</p>
           )}
         </div>
-        <Pagination
-          currentPage={currentPage}
-          totalMovies={watchLaterMovies.length}
-          moviesPerPage={moviesPerPage}
-          nextPage={() => setCurrentPage((prev) => prev + 1)}
-          prevPage={() => setCurrentPage((prev) => prev - 1)}
-        />
+        <div className="flex justify-center mt-4">
+            <Pagination
+                currentPage={currentPage}
+                totalMovies={watchLaterMovies.length}
+                moviesPerPage={moviesPerPage}
+                nextPage={() => setCurrentPage((prev) => prev + 1)}
+                prevPage={() => setCurrentPage((prev) => prev - 1)}
+            />
+        </div>
       </div>
     </Layout>
   );

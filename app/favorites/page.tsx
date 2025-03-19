@@ -33,9 +33,7 @@ export default function Favorites() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await fetch("/api/favorites", {
-
-        });
+        const response = await fetch("/api/favorites");
         if (!response.ok) throw new Error("Failed to fetch favorites");
   
         const data = await response.json();
