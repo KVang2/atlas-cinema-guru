@@ -62,6 +62,18 @@ export async function fetchTitles(
  */
 export async function fetchFavorites(page: number, userEmail: string) {
   try {
+    const moviesPerPage = 6;
+    const offset = (page - 1) * moviesPerPage;
+
+    // Get total count of favorites for pagination
+    const totalCountResult = await db
+      .selectFrom("favorites")
+      .select("title_id")
+      .where("user_id", "=", userEmail)
+      .execute();
+    const totalMovies = totalCountResult.length;
+
+    // Get watch later movies to mark them
     const watchLater = (
       await db
         .selectFrom("watchlater")
@@ -70,35 +82,52 @@ export async function fetchFavorites(page: number, userEmail: string) {
         .execute()
     ).map((row) => row.title_id);
 
+    // Fetch paginated favorites
     const titles = await db
       .selectFrom("titles")
       .selectAll("titles")
       .innerJoin("favorites", "titles.id", "favorites.title_id")
       .where("favorites.user_id", "=", userEmail)
       .orderBy("titles.released", "asc")
-      .limit(6)
-      .offset((page - 1) * 6)
+      .limit(moviesPerPage)
+      .offset(offset)
       .execute();
 
-    return titles.map((row) => ({
-      ...row,
-      favorited: true,
-      watchLater: watchLater.includes(row.id),
-      image: `/images/${row.id}.webp`,
-    }));
+    return {
+      favorites: titles.map((row) => ({
+        ...row,
+        favorited: true,
+        watchLater: watchLater.includes(row.id),
+        image: `/images/${row.id}.webp`,
+      })),
+      totalMovies,
+    };
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch favorites.");
   }
 }
 
+
 /**
  *  Add a title to a users favorites list.
  */
 export async function insertFavorite(title_id: string, userEmail: string) {
   try {
-    const data =
-      await sql<Question>`INSERT INTO favorites (title_id, user_id) VALUES (${title_id}, ${userEmail})`;
+    // Check if the movie is already in the favorites list
+    const existingFavorite = await sql`
+      SELECT * FROM favorites WHERE title_id = ${title_id} AND user_id = ${userEmail}
+    `;
+
+    if (existingFavorite.rowCount > 0) {
+      throw new Error("Movie is already in favorites.");
+    }
+
+    // Insert only if it doesn't exist
+    const data = await sql`
+      INSERT INTO favorites (title_id, user_id) VALUES (${title_id}, ${userEmail})
+    `;
+
     insertActivity(title_id, userEmail, "FAVORITED");
     return data.rows;
   } catch (error) {

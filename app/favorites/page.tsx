@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Layout from "@/components/Layout";
 import Movie from "@/components/Movie";
-import Pagination from "@/components/Pagination";
+import FavoritesPagination from "@/components/FavoritesPagination";
 
 export default function Favorites() {
   const { data: session, status } = useSession();
@@ -22,6 +22,7 @@ export default function Favorites() {
 
   const [favorites, setFavorites] = useState<Movie[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalMovies, setTotalMovies] = useState(0);
   const moviesPerPage = 6; // Number of movies per page
 
   useEffect(() => {
@@ -33,38 +34,19 @@ export default function Favorites() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await fetch("/api/favorites");
+        const response = await fetch(`/api/favorites?page=${currentPage}`);
         if (!response.ok) throw new Error("Failed to fetch favorites");
-  
+
         const data = await response.json();
-        console.log("Fetched Favorites:", data.favorites); // Debugging log
-  
-        setFavorites(data.favorites || []); // Ensure it sets an array
+        setFavorites(data.favorites || []);
+        setTotalMovies(data.totalMovies || 0); // Store total number of favorites
       } catch (error) {
         console.error("Error fetching favorites:", error);
       }
     };
-  
+
     if (session) fetchFavorites();
-  }, [session]);
-
-  // Pagination Logic
-  const indexOfLastMovie = currentPage * moviesPerPage;
-  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-  const currentMovies = favorites.slice(indexOfFirstMovie, indexOfLastMovie);
-
-  // Pagination Functions
-  const nextPage = () => {
-    if (indexOfLastMovie < favorites.length) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
+  }, [session, currentPage]);
 
   return (
     <Layout>
@@ -74,11 +56,9 @@ export default function Favorites() {
         </div>
 
         {/* Favorite Movies */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 pt-4 gap-8">
-          {currentMovies.length > 0 ? (
-            currentMovies.map((movie) => (
-              <Movie key={movie.id} {...movie} favorited={true} />
-            ))
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-4 gap-8">
+          {favorites.length > 0 ? (
+            favorites.map((movie) => <Movie key={movie.id} {...movie} favorited={true} />)
           ) : (
             <p className="text-gray-400 col-span-3 text-center">No favorites found.</p>
           )}
@@ -86,12 +66,12 @@ export default function Favorites() {
 
         {/* Pagination Component */}
         <div className="flex justify-center mt-4">
-          <Pagination
+          <FavoritesPagination
             currentPage={currentPage}
-            totalMovies={favorites.length}
+            totalMovies={totalMovies}
             moviesPerPage={moviesPerPage}
-            nextPage={nextPage}
-            prevPage={prevPage}
+            nextPage={() => setCurrentPage((prev) => prev + 1)}
+            prevPage={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           />
         </div>
       </div>
