@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react"; // Import session for authentication
+import { useSession } from "next-auth/react";
 
 interface MovieProps {
   id: string;
@@ -8,74 +8,105 @@ interface MovieProps {
   synopsis: string;
   genre: string;
   image: string;
-  favorited?: boolean; // Prop received from Favorites page
+  favorited?: boolean;
+  watchLater?: boolean;
 }
 
-export default function Movie({ id, title, released, synopsis, genre, image, favorited = false }: MovieProps) {
-  const { data: session } = useSession(); // Get user session
+export default function Movie({ id, title, released, synopsis, genre, image, favorited = false, watchLater = false }: MovieProps) {
+  const { data: session } = useSession();
   const [isFavorite, setIsFavorite] = useState<boolean>(favorited);
+  const [isWatchLater, setIsWatchLater] = useState<boolean>(watchLater);
 
   console.log("Movie Image URL:", image);
 
-  // Fetch favorite status when the component mounts
+  // Fetch Favorite & Watch Later Status when component mounts
   useEffect(() => {
-    async function checkFavoriteStatus() {
+    async function fetchStatuses() {
       try {
-        const response = await fetch(`/api/favorites`);
-        if (!response.ok) throw new Error("Failed to fetch favorites");
+        const [favResponse, watchLaterResponse] = await Promise.all([
+          fetch(`/api/favorites`),
+          fetch(`/api/watch-later`),
+        ]);
 
-        const data = await response.json();
-        const isFav = data.favorites.some((movie: { id: string }) => movie.id === id);
+        const rawFavText = await favResponse.text();
+        const rawWatchLaterText = await watchLaterResponse.text();
 
-        // Only update state if different from current value
-        if (isFav !== isFavorite) {
-          setIsFavorite(isFav);
-        }
+        console.log("Raw Favorites Response:", rawFavText);
+        console.log("Raw Watch Later Response:", rawWatchLaterText);
+
+        if (!favResponse.ok) throw new Error(`Failed to fetch favorites: ${rawFavText}`);
+        if (!watchLaterResponse.ok) throw new Error(`Failed to fetch Watch Later list: ${rawWatchLaterText}`);
+
+        const favData = JSON.parse(rawFavText);
+        const watchLaterData = JSON.parse(rawWatchLaterText);
+
+        setIsFavorite(favData.favorites.some((movie: { id: string }) => movie.id === id));
+        setIsWatchLater(watchLaterData.watchLater.some((movie: { id: string }) => movie.id === id));
+
       } catch (error) {
-        console.error("Failed to check favorite status:", error);
+        console.error("Failed to fetch movie status:", error);
       }
     }
 
-    checkFavoriteStatus();
-  }, [id]); // Runs only when the `id` changes
+    fetchStatuses();
+  }, [id]);
 
-  // Handle favorite toggle
+  // Handle Favorite Toggle
   const handleFavorite = async () => {
     if (!session) {
-      console.error("User is not logged in. Redirecting to login.");
+      console.error("User is not logged in.");
       return;
     }
 
     try {
-      const method = isFavorite ? "DELETE" : "POST"; // Toggle favorite state
+      const method = isFavorite ? "DELETE" : "POST";
       const response = await fetch(`/api/favorites`, {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.user?.accessToken}`, // Ensure user is authenticated
         },
-        body: JSON.stringify({ movieId: id }), // Ensure correct format
+        body: JSON.stringify({ movieId: id }),
       });
 
-      // 🚀 Debugging logs
-      console.log("Favorite API Response:", response);
-
       if (!response.ok) {
-        const errorMessage = await response.text();
-        console.error("Error response from API:", errorMessage);
-        throw new Error(`Failed to update favorite: ${errorMessage}`);
+        throw new Error("Failed to update favorite.");
       }
 
-      setIsFavorite((prev) => !prev); // Toggle favorite state
+      setIsFavorite((prev) => !prev);
+      window.dispatchEvent(new Event("favoritesUpdated"));
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error toggling favorite movie:", error.message);
-      } else {
-        console.error("Error toggling favorite movie:", error);
-      }
+      console.error("Error toggling favorite movie:", error);
     }
   };
-  
+
+  // Handle Watch Later Toggle
+  const handleWatchLater = async () => {
+    if (!session) {
+      console.error("User is not logged in.");
+      return;
+    }
+
+    try {
+      const method = isWatchLater ? "DELETE" : "POST";
+      const response = await fetch(`/api/watch-later`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ movieId: id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update Watch Later.");
+      }
+
+      setIsWatchLater((prev) => !prev);
+      window.dispatchEvent(new Event("watchLaterUpdated"));
+    } catch (error) {
+      console.error("Error toggling Watch Later movie:", error);
+    }
+  };
+
   return (
     <div className="relative group overflow-hidden rounded shadow-lg border-[#1ED2AF] border-1">
       {/* Movie Image */}
@@ -85,10 +116,10 @@ export default function Movie({ id, title, released, synopsis, genre, image, fav
         width={500}
         height={500}
         className="w-full h-auto rounded-lg"
-        onError={(e) => (e.currentTarget.src = "/images/placeholder.jpg")} // Fallback image
+        onError={(e) => (e.currentTarget.src = "/images/placeholder.jpg")}
       />
 
-      {/* Favorite/WatchLater Button */}
+      {/* Favorite/Watch Later Buttons */}
       <div className="absolute top-1 right-1 m-1 space-x-1 flex items-center">
         <button onClick={handleFavorite}>
           <img
@@ -97,21 +128,21 @@ export default function Movie({ id, title, released, synopsis, genre, image, fav
             className="w-6 h-6 cursor-pointer"
           />
         </button>
-        <button>
-          <img src="/images/clock.png" alt="Watch Later Icon" className="w-6 h-6" />
+        <button onClick={handleWatchLater}>
+          <img
+            src={isWatchLater ? "/images/fillclock.png" : "/images/clock.png"}
+            alt="Watch Later Icon"
+            className="w-6 h-6 cursor-pointer"
+          />
         </button>
       </div>
 
       {/* Hover Overlay with Movie Details */}
       <div className="absolute bottom-0 left-0 w-full h-1/3 flex flex-col justify-center items-center text-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-y-4 duration-300 p-4">
-        <div className="flex items-start">
-          <h3 className="text-white text-md">{title}</h3>
-          <p className="text-white text-sm">{released}</p>
-        </div>
-        <div>
-          <p className="text-white text-sm">{synopsis}</p>
-          <p className="text-white text-sm">{genre}</p>
-        </div>
+        <h3 className="text-white text-md">{title}</h3>
+        <p className="text-white text-sm">{released}</p>
+        <p className="text-white text-sm">{synopsis}</p>
+        <p className="text-white text-sm">{genre}</p>
       </div>
     </div>
   );

@@ -34,9 +34,7 @@ export default function Favorites() {
     const fetchFavorites = async () => {
       try {
         const response = await fetch("/api/favorites", {
-          headers: {
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
+
         });
         if (!response.ok) throw new Error("Failed to fetch favorites");
   

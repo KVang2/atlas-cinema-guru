@@ -30,9 +30,6 @@ export default function Pagination({
         Previous
       </button>
 
-      {/* Page Number Display */}
-      <span className="text-white px-4">{`Page ${currentPage}`}</span>
-
       {/* Next Button */}
       <button
         onClick={nextPage}
