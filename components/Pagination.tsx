@@ -16,6 +16,7 @@ export default function Pagination({
   nextPage,
   prevPage,
 }: PaginationProps) {
+
   return (
     <div className="flex items-center space-x-0.5 bg-[#00003c] p-2 rounded-full w-fit mt-4">
       {/* Previous Button */}
