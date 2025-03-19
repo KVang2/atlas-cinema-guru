@@ -74,7 +74,7 @@ export default function Favorites() {
         </div>
 
         {/* Favorite Movies */}
-        <div className="grid grid-cols-3 pt-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 pt-4 gap-8">
           {currentMovies.length > 0 ? (
             currentMovies.map((movie) => (
               <Movie key={movie.id} {...movie} favorited={true} />

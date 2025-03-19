@@ -65,7 +65,7 @@ export default function WatchLaterPage() {
     <Layout>
       <div>
         <h1 className="text-center text-4xl font-extrabold mt-4">Watch Later</h1>
-        <div className="grid grid-cols-3 pt-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 pt-4 gap-8">
           {watchLaterMovies.length > 0 ? (
             watchLaterMovies.map((movie) => <Movie key={movie.id} {...movie} watchLater={true} />)
           ) : (

@@ -138,11 +138,15 @@ export default function Movie({ id, title, released, synopsis, genre, image, fav
       </div>
 
       {/* Hover Overlay with Movie Details */}
-      <div className="absolute bottom-0 left-0 w-full h-1/3 flex flex-col justify-center items-center text-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-y-4 duration-300 p-4">
-        <h3 className="text-white text-md">{title}</h3>
-        <p className="text-white text-sm">{released}</p>
-        <p className="text-white text-sm">{synopsis}</p>
-        <p className="text-white text-sm">{genre}</p>
+      <div className="absolute bottom-0 left-0 w-full bg-[#00003c] text-white p-2 rounded-b-lg 
+    opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <h3 className="text-md">{title} ({released})</h3>
+        <p className="text-xs">{synopsis}</p>
+
+      {/* Genre Badge */}
+        <div className="mt-2">
+          <span className="bg-[#1ED2AF] text-white px-3 py-1 rounded-full text-sm">{genre}</span>
+        </div>
       </div>
     </div>
   );
