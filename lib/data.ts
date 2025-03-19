@@ -119,7 +119,7 @@ export async function insertFavorite(title_id: string, userEmail: string) {
       SELECT * FROM favorites WHERE title_id = ${title_id} AND user_id = ${userEmail}
     `;
 
-    if (existingFavorite.rowCount > 0) {
+    if (existingFavorite.rowCount && existingFavorite.rowCount > 0) {
       throw new Error("Movie is already in favorites.");
     }
 
@@ -177,6 +177,16 @@ export async function fetchWatchLaters(page: number, userEmail: string) {
         .execute()
     ).map((row) => row.title_id);
 
+    // Get total count for pagination
+    const totalMoviesResult = await db
+      .selectFrom("watchlater")
+      .where("user_id", "=", userEmail)
+      .select((eb) => eb.fn.count<number>("title_id").as("count"))
+      .execute();
+
+    const totalMovies = totalMoviesResult.length > 0 ? Number(totalMoviesResult[0].count) : 0;
+
+    // Fetch watch later movies for the current page
     const titles = await db
       .selectFrom("titles")
       .selectAll("titles")
@@ -187,17 +197,24 @@ export async function fetchWatchLaters(page: number, userEmail: string) {
       .offset((page - 1) * 6)
       .execute();
 
-    return titles.map((row) => ({
-      ...row,
-      favorited: favorites.includes(row.id),
-      watchLater: true,
-      image: `/images/${row.id}.webp`,
-    }));
+    // Remove duplicates using Map()
+    const uniqueMovies = Array.from(new Map(titles.map(movie => [movie.id, movie])).values());
+
+    return {
+      movies: uniqueMovies.map((row) => ({
+        ...row,
+        favorited: favorites.includes(row.id),
+        watchLater: true,
+        image: `/images/${row.id}.webp`,
+      })),
+      totalMovies,
+    };
   } catch (error) {
     console.error("Database Error:", error);
-    throw new Error("Failed to fetch watchLater.");
+    throw new Error("Failed to fetch Watch Later movies.");
   }
 }
+
 
 /**
  * Add a title to a users watch later list.

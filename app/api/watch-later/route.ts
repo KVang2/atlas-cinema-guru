@@ -7,14 +7,16 @@ import { auth } from "@/auth";
  */
 export const GET = auth(async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
-  const page = params.get("page") ? Number(params.get("page")) : 1;
+  const pageParam = params.get("page");
+  const page = pageParam ? Number(pageParam) : 1;
+
+  if (isNaN(page) || page < 1) {
+    return NextResponse.json({ error: "Invalid page number" }, { status: 400 });
+  }
 
   //@ts-ignore
   if (!req.auth) {
-    return NextResponse.json(
-      { error: "Unauthorized - Not logged in" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized - Not logged in" }, { status: 401 });
   }
 
   const {
@@ -22,16 +24,14 @@ export const GET = auth(async (req: NextRequest) => {
   } = req.auth;
 
   try {
-    const watchLaterMovies = await fetchWatchLaters(page, email); // Ensure page & email are used
-    return NextResponse.json({ watchLater: watchLaterMovies });
+    const { movies, totalMovies } = await fetchWatchLaters(page, email);
+    return NextResponse.json({ watchLater: movies, totalMovies });
   } catch (error) {
     console.error("Error fetching Watch Later movies:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch Watch Later movies" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch Watch Later movies" }, { status: 500 });
   }
 });
+
 
 /**
  * POST /api/watch-later - Add a movie to Watch Later

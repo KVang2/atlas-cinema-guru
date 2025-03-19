@@ -28,17 +28,17 @@ export default function Movie({ id, title, released, synopsis, genre, image, fav
           fetch(`/api/watch-later`),
         ]);
 
-        const rawFavText = await favResponse.text();
-        const rawWatchLaterText = await watchLaterResponse.text();
+        const FavText = await favResponse.text();
+        const WatchLaterText = await watchLaterResponse.text();
 
-        console.log("Raw Favorites Response:", rawFavText);
-        console.log("Raw Watch Later Response:", rawWatchLaterText);
+        console.log("Favorites Response:", FavText);
+        console.log("Watch Later Response:", WatchLaterText);
 
-        if (!favResponse.ok) throw new Error(`Failed to fetch favorites: ${rawFavText}`);
-        if (!watchLaterResponse.ok) throw new Error(`Failed to fetch Watch Later list: ${rawWatchLaterText}`);
+        if (!favResponse.ok) throw new Error(`Failed to fetch favorites: ${FavText}`);
+        if (!watchLaterResponse.ok) throw new Error(`Failed to fetch Watch Later list: ${WatchLaterText}`);
 
-        const favData = JSON.parse(rawFavText);
-        const watchLaterData = JSON.parse(rawWatchLaterText);
+        const favData = JSON.parse(FavText);
+        const watchLaterData = JSON.parse(WatchLaterText);
 
         setIsFavorite(favData.favorites.some((movie: { id: string }) => movie.id === id));
         setIsWatchLater(watchLaterData.watchLater.some((movie: { id: string }) => movie.id === id));

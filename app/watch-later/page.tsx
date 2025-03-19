@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Layout from "@/components/Layout";
 import Movie from "@/components/Movie";
-import Pagination from "@/components/Pagination";
+import WatchPagination from "@/components/WatchPagination";
 
 export default function WatchLaterPage() {
   const { data: session, status } = useSession();
@@ -21,6 +21,7 @@ export default function WatchLaterPage() {
 
   const [watchLaterMovies, setWatchLaterMovies] = useState<Movie[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalMovies, setTotalMovies] = useState(0);
   const moviesPerPage = 6;
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function WatchLaterPage() {
         const response = await fetch(`/api/watch-later?page=${currentPage}`);
 
         const textResponse = await response.text();
-        console.log("Raw Watch Later API Response:", textResponse);
+        console.log("Watch Later API Response:", textResponse);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch Watch Later movies: ${textResponse}`);
@@ -44,7 +45,12 @@ export default function WatchLaterPage() {
         const data = JSON.parse(textResponse);
         console.log("Fetched Watch Later Movies:", data.watchLater);
 
+        const uniqueMovies: Movie[] = Array.from(
+          new Map<string, Movie>(data.watchLater.map((movie: Movie) => [movie.id, movie])).values()
+        );
+
         setWatchLaterMovies(data.watchLater || []);
+        setTotalMovies(data.totalMovies || 0); // Store total number of watch later movies
       } catch (error) {
         console.error("Error fetching Watch Later movies:", error);
       }
@@ -65,7 +71,7 @@ export default function WatchLaterPage() {
     <Layout>
       <div>
         <h1 className="text-center text-4xl font-extrabold mt-4">Watch Later</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 pt-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pt-4 gap-8">
           {watchLaterMovies.length > 0 ? (
             watchLaterMovies.map((movie) => <Movie key={movie.id} {...movie} watchLater={true} />)
           ) : (
@@ -73,13 +79,13 @@ export default function WatchLaterPage() {
           )}
         </div>
         <div className="flex justify-center mt-4">
-            <Pagination
-                currentPage={currentPage}
-                totalMovies={watchLaterMovies.length}
-                moviesPerPage={moviesPerPage}
-                nextPage={() => setCurrentPage((prev) => prev + 1)}
-                prevPage={() => setCurrentPage((prev) => prev - 1)}
-            />
+          <WatchPagination
+            currentPage={currentPage}
+            totalMovies={totalMovies}
+            moviesPerPage={moviesPerPage}
+            nextPage={() => setCurrentPage((prev) => prev + 1)}
+            prevPage={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          />
         </div>
       </div>
     </Layout>
