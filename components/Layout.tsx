@@ -11,14 +11,6 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen">
       
-      {/* Mobile Menu Button */}
-      <button
-        className="md:hidden fixed top-4 left-4 bg-[#1ED2AF] p-2 rounded-full z-50"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        <img src="/images/menu.png" alt="Menu" className="w-6 h-6" />
-      </button>
-
       {/* Sidebar - Collapsible */}
       <div
         className={`fixed top-0 left-0 h-full bg-[#1ED2AF] p-5 pt-8 shadow-lg transition-all duration-300 border-r-2 border-[#00003c]
@@ -53,7 +45,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
           {/* Latest Activities */}
           <div
-            className={`mt-4 p-4 bg-[#8EE3D6] rounded-lg shadow-lg text-lg transition-opacity duration-300 whitespace-nowrap ${
+            className={`mt-4 p-4 bg-[#1dfedc] rounded-lg shadow-lg text-lg transition-opacity duration-300 whitespace-nowrap ${
               isSidebarOpen ? "opacity-100" : "opacity-0"
             }`}
           >

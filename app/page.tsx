@@ -148,7 +148,7 @@ export default function HomePage() {
 
       {/* Movie List - Centered */}
       <div className="flex flex-col items-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 border-[#1ED2AF] border- p-4 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 gap-6 border-[#1ED2AF] border- p-4 rounded-lg">
           {currentMovies.map((movie) => (
             <Movie key={movie.id} {...movie} />
           ))}
