@@ -75,7 +75,9 @@ export default function WatchLaterPage() {
           {watchLaterMovies.length > 0 ? (
             watchLaterMovies.map((movie) => <Movie key={movie.id} {...movie} watchLater={true} />)
           ) : (
-            <p className="text-gray-400 col-span-3 text-center">No movies in Watch Later.</p>
+            <div className="text-gray-400 col-span-3 text-center animate-pulse">
+              Loading...
+            </div>
           )}
         </div>
         <div className="flex justify-center mt-4">

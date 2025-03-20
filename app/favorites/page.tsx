@@ -60,7 +60,9 @@ export default function Favorites() {
           {favorites.length > 0 ? (
             favorites.map((movie) => <Movie key={movie.id} {...movie} favorited={true} />)
           ) : (
-            <p className="text-gray-400 col-span-3 text-center">No favorites found.</p>
+            <div className="text-gray-400 col-span-3 text-center animate-pulse">
+              Loading...
+            </div>
           )}
         </div>
 

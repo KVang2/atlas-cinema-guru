@@ -301,7 +301,7 @@ export async function fetchActivities(page: number, userEmail: string) {
   }
 }
 
-async function insertActivity(
+export async function insertActivity(
   title_id: string,
   userEmail: string,
   activity: "FAVORITED" | "WATCH_LATER"

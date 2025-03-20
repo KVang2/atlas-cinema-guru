@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { ReactNode } from "react";
+import ActivitiesLog from "components/ActivitiesLog";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
@@ -45,13 +46,11 @@ export default function Layout({ children }: { children: ReactNode }) {
 
           {/* Latest Activities */}
           <div
-            className={`mt-4 p-4 bg-[#1dfedc] rounded-lg shadow-lg text-lg transition-opacity duration-300 whitespace-nowrap ${
+            className={`mt-2 p-2 bg-[#2be8c2] rounded-lg text-lg transition-opacity duration-300 whitespace-nowrap ${
               isSidebarOpen ? "opacity-100" : "opacity-0"
-            }`}
+           }`}
           >
-            <h2 className="text-[#00003c] font-extrabold text-lg text-center mb-2">
-              Latest Activities
-            </h2>
+            <ActivitiesLog />
           </div>
         </div>
       </div>
