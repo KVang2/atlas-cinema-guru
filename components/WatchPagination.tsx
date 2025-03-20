@@ -32,7 +32,7 @@ export default function WatchPagination({
       >
         Previous
       </button>
-      {/* Next Button */}
+      {/* Next Buttons */}
       <button
         onClick={nextPage}
         disabled={isLastPage || totalPages === 0}
