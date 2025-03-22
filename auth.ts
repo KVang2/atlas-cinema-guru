@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 
+console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET);
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   theme: {
     brandColor: "#1ED2AF",
