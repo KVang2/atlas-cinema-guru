@@ -1,4 +1,4 @@
-{/* "use client";
+"use client";
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
@@ -13,4 +13,4 @@ export default function LoginPage() {
     </div>
   );
 }
-*/}
+

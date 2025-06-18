@@ -7,8 +7,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     logo: "/logo.png",
     buttonText: "#ffffff",
   },
-  providers: [GitHub],
-  secret: process.env.AUTH_GITHUB_SECRET,
+  providers: [
+     GitHub({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     authorized: async ({ auth }) => {
       // Logged in users are authenticated, otherwise redirect to login page
